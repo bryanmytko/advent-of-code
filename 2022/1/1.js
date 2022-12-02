@@ -21,5 +21,8 @@ input.split(/\r?\n/).forEach((line) => {
   curSum += parseInt(line);
 });
 
+/* This is Part 2.
+ * For Part 1, just sum between empty lines and update if greater than
+ * the value that's currently the greatest. */
 console.log(topThree);
 console.log(topThree.reduce((p, v) => p + v));
