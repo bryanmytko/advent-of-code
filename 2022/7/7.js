@@ -1,75 +1,124 @@
 const fs = require("fs");
-const file = "./testInput.txt";
+// const file = "./testInput.txt";
+const file = "./input.txt";
 
+const TOTAL_SIZE = 70000000;
+const REQ_SIZE = 30000000;
+const MAX_VAL = 100000;
 const input = fs.readFileSync(file, "utf-8");
 const lines = input.split(/\r?\n/);
-const runCommand = (line) => {
-  let dir;
 
-  if (line.startsWith("$ cd")) {
-    dir = line.split(" ")[2];
-    console.log("changing to ", dir);
-  }
-};
+const dirs = {};
+const pathHistory = [];
 
-const dirs = {
-  "/": { value: 0, sub: [], parent: null },
-};
+lines.forEach((line) => {
+  const reNum = /\d+/;
+  if (line.match(reNum)) {
+    const value = Number(line.match(reNum)[0]);
+    const currPath = [];
 
-let curr_dir = "/";
-
-lines.forEach((line, index) => {
-  if (line === "") return false;
-
-  if (line.startsWith("$ cd")) {
-    console.log("dasdf", line.split(" "));
-    curr_dir = line.split(" ")[2];
-    if (!Object.keys(dirs).includes(curr_dir))
-      dirs[curr_dir] = { value: 0, sub: [] };
+    pathHistory.forEach((dir) => {
+      currPath.push(dir);
+      const dirCount = dirs[currPath.join("/")] ?? 0;
+      dirs[currPath.join("/")] = dirCount + value;
+    });
   }
 
-  /* ls command */
-  if (line.startsWith("$ ls")) {
-    let size = 0;
-    /* read each listed file */
-    for (let i = index + 1; i < lines.length; i++) {
-      console.log("Reading: ", lines[i]);
-      const num = lines[i].match(/(\d+)+/gi);
+  if (line.startsWith("$ cd")) {
+    const dir = line.split(" ")[2];
 
-      /* Does it start with a num? if so, add value */
-      if (num) {
-        size += parseInt(num[0]);
-        // console.log("FOUND A NUM: ", num[0]);
-        // console.log("size: ", size);
-      }
-
-      /* If it's a new command we stop */
-      if (lines[i].startsWith("$")) {
-        end = true;
-        break;
-      }
-
-      /* If line is a dir, add that to count up later */
-      if (lines[i].startsWith("dir")) {
-        const dir = lines[i].split(" ")[1];
-
-        /* If we've already encountered this dir */
-        if (Object.keys(dirs).includes(dir)) {
-          size += dirs[dir].value;
-          dirs[curr_dir].sub.push(dir);
-          dirs[curr_dir].parent = dir;
-        } else {
-          /* If it's new! */
-          dirs[dir] = { value: 0, sub: [], parent: curr_dir };
-        }
-      }
-    }
-    console.log("final size that i should add:", size);
-    console.log("adding that to", dirs[curr_dir]);
-    console.log("curr dir:", curr_dir);
-    dirs[curr_dir].value += size;
-    console.log("=============");
+    if (dir === "..") return pathHistory.pop();
+    pathHistory.push(dir);
   }
 });
 
-console.log(dirs);
+// Part 1.
+const sizes = Object.values(dirs);
+const inRange = sizes.filter((d) => d <= MAX_VAL);
+console.log(
+  "Part 1.",
+  inRange.reduce((prev, val) => prev + val)
+);
+
+// Part 2.
+const sorted = sizes.sort((a, b) => b - a);
+const free = TOTAL_SIZE - sorted[0];
+const required = REQ_SIZE - free;
+
+console.log(
+  "Part 2.",
+  sorted.reverse().find((n) => n >= required)
+);
+
+// Attempt 2
+//
+// const dirs = [{ name: "/", value: 0, children: [], parent: null }];
+
+// let curr_dir = dirs[0];
+
+// const findParent = (obj = {}, key, value) => {
+//   const result = [];
+//   const recursiveSearch = (obj = {}) => {
+//     if (!obj || typeof obj !== "object") {
+//       return;
+//     }
+//     if (obj[key] === value) {
+//       result.push(obj);
+//     }
+//     Object.keys(obj).forEach(function (k) {
+//       recursiveSearch(obj[k]);
+//     });
+//   };
+//
+//   recursiveSearch(obj);
+//   return result[0];
+// };
+//
+// lines.forEach((line, index) => {
+//   if (index < 2) return;
+//
+//   if (line.startsWith("$ cd")) {
+//     /* Make note of this dir if it hasn't been seen */
+//     const dir_name = line.split(" ")[2];
+//
+//     if (dir_name === "..") {
+//       curr_dir = findParent(dirs, "name", curr_dir.parent);
+//       if (!curr_dir) curr_dir = dirs[0];
+//     } else {
+//       if (!curr_dir.children.some((c) => c.name === dir_name)) {
+//         curr_dir.children.push({
+//           name: dir_name,
+//           value: 0,
+//           children: [],
+//           parent: curr_dir.name,
+//         });
+//       }
+//       const foundChild = curr_dir.children.find((c) => c.name === dir_name);
+//       if (!foundChild) throw new Error("here");
+//       curr_dir = foundChild;
+//     }
+//   }
+//
+//   if (line.startsWith("$ ls")) {
+//     for (let i = index + 1; i < lines.length; i++) {
+//       const num = lines[i].match(/(\d+)+/gi);
+//       if (num) curr_dir.value += parseInt(num[0]);
+//       if (lines[i].startsWith("$")) break;
+//     }
+//   }
+// });
+//
+// const sumChildren = (obj) => {
+//   if (!obj.children.length) {
+//     console.log("returning: ", obj.value);
+//     return obj.value;
+//   }
+//
+//   obj.children.forEach((child) => {
+//     obj.value += sumChildren(child);
+//   });
+// };
+//
+// sumChildren(dirs[0]);
+//
+// console.dir(dirs, { depth: null });
