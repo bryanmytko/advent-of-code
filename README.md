@@ -1,8 +1,6 @@
 # Advent of Code
 
-These are my solutions for the Advent of Code problems.
-
-Repo will be private while the competition is live.
+These are my (messy) solutions for the Advent of Code problems.
 
 [https://adventofcode.com](https://adventofcode.com/)
 
