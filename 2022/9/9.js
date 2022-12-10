@@ -17,8 +17,6 @@ const moveTail = (h, t) => {
   }
 
   return { x: t.x, y: t.y };
-
-  throw new Error("The rope moved too far, something is wrong.");
 };
 
 const solve = (ropeLength) => {
