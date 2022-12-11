@@ -4,7 +4,7 @@ const input = fs.readFileSync(file, "utf-8");
 
 const reportCycles = [20, 60, 100, 140, 180, 220];
 const report = [];
-const CRT = new Array(6 * 40).fill(".");
+const CRT = new Array(6 * 40).fill(" ");
 
 let cycle = 1;
 let X = 1;
@@ -17,7 +17,7 @@ const processCycle = () => {
 const draw = () => {
   const scrPtr = (cycle - 1) % 40;
   if (scrPtr === X - 1 || scrPtr === X || scrPtr === X + 1)
-    CRT[cycle - 1] = "#";
+    CRT[cycle - 1] = "█";
 };
 
 input.split("\n").forEach((line) => {
