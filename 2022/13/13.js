@@ -55,3 +55,20 @@ console.log(
   "Part 1.",
   ordered.reduce((a, b) => a + b, 0)
 );
+
+const dividerPackets = [[[2]], [[6]]];
+
+const cleanLines = lines
+  .filter((line) => !line.startsWith("#") && line !== "")
+  .map((line) => JSON.parse(line));
+
+cleanLines.push(dividerPackets[0]);
+cleanLines.push(dividerPackets[1]);
+cleanLines.sort(compare);
+
+const ans = dividerPackets
+  .map((divider) => cleanLines.findIndex((line) => line === divider))
+  .map((div) => div + 1)
+  .reduce((a, b) => a * b);
+
+console.log("Part 2.", ans);
