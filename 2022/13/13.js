@@ -1,61 +1,55 @@
 const fs = require("fs");
-const file = "./testInput.txt";
-// const file = "./input.txt";
+// const file = "./testInput.txt";
+const file = "./input.txt";
 
 const lines = fs.readFileSync(file, "utf-8").split(/\n/);
 const ordered = [];
 let count = 0;
 
-const checkOrder = (left, right) => {
-  let ordered = true;
+const compare = (left, right) => {
+  if (Number.isInteger(left) && Number.isInteger(right)) {
+    if (left === right) return 0;
+    if (left < right) return -1;
+    return 1;
+  }
 
-  if (typeof left === "string") left = JSON.parse(left);
-  if (typeof right === "string") right = JSON.parse(right);
-
-  /* If they are both lists of numbers*/
-  if (Number.isInteger(left[0]) && Number.isInteger(right[0])) {
+  if (Array.isArray(left) && Array.isArray(right)) {
     for (let i = 0; i < left.length; i++) {
-      console.log("Comparing", left[i], "vs.", right[i]);
-      if (left[i] > right[i] || !right[i]) {
-        return (ordered = false);
-      }
+      if (right[i] === undefined) return 1;
+      const c = compare(left[i], right[i]);
+      if (c === -1) return -1;
+      if (c === 1) return 1;
     }
-    console.log(`This pair is ${ordered ? "ordered" : "not ordered"}`);
-    return ordered;
+
+    if (left.length === right.length) return 0;
+    if (left.length < right.length) return -1;
+    if (left.length > right.length) return 1;
   }
 
-  if (Number.isInteger(left[0]) && Array.isArray(right[0])) {
-    ordered = checkOrder([left], right);
-    console.log(`This pair is ${ordered ? "ordered" : "not ordered"}`);
-    return ordered;
+  if (Array.isArray(left) && Number.isInteger(right)) {
+    return compare(left, [right]);
   }
 
-  if (Array.isArray(left[0]) && Number.isInteger(right[0])) {
-    ordered = checkOrder(left, [right]);
-    console.log(`This pair is ${ordered ? "ordered" : "not ordered"}`);
-    return ordered;
-  }
-
-  if (Array.isArray(left[0]) && Array.isArray(right[0])) {
-    ordered = checkOrder(left[0], right[0]);
-    console.log(`This pair is ${ordered ? "ordered" : "not ordered"}`);
-    return ordered;
+  if (Number.isInteger(left) && Array.isArray(right)) {
+    return compare([left], right);
   }
 };
 
 lines.forEach((line, index) => {
+  if (line.startsWith("#")) return;
   if (line === "" || lines[index + 1] === "") return;
-  const left = lines[index];
-  const right = lines[index + 1];
+
+  let left = lines[index];
+  let right = lines[index + 1];
+
+  if (typeof left === "string") left = JSON.parse(left);
+  if (typeof right === "string") right = JSON.parse(right);
+
   count++;
 
-  if (checkOrder(left, right)) ordered.push(count);
-
-  console.log("======================");
+  const result = compare(left, right);
+  if (result === -1) ordered.push(count);
 });
-
-/* TODO it's missing case 6 */
-console.log(ordered);
 
 console.log(
   "Part 1.",
