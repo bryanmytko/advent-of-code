@@ -1,41 +1,26 @@
 const fs = require("fs");
-const file = "./testInput.txt";
-// const file = "./input.txt";
+// const file = "./testInput.txt";
+const file = "./input.txt";
 const input = fs.readFileSync(file, "utf-8").split(/\n/);
 
-let grid = input
-  .filter((line) => line !== "")
-  .map((line) => line.replace("S", "a").replace("E", "{").split(""));
+let grid = input.filter((line) => line !== "").map((line) => line.split(""));
+const alphabet = Array.from(Array(26))
+  .map((_, i) => i + 97)
+  .map((n) => String.fromCharCode(n));
 
-// grid[0][0] = "a";
-// grid[2][5] = "{";
+alphabet.push("E");
+alphabet.unshift("S");
 
-// grid[0][20] = "a";
-// start: 21, 0
-console.log(grid);
-
-const bfs = (root) => {
+const bfs = (root, goal, alpha) => {
   let queue = [root];
-  const seen = new Set();
-
-  let steps = 0;
+  const visited = new Set();
 
   while (queue.length) {
     const curr = queue.shift();
-    const { x, y } = curr;
+    const { x, y, s } = curr;
 
-    // if (x === 5 && y === 2) {
-    // try {
-    if (grid[y][x] === "{") {
-      console.log("Part 1.", steps - 1);
-      return;
-    }
-    // } catch (e) {
-    //   console.log("x:", x);
-    //   console.log("y:", y);
-    //   console.log(e);
-    //   throw new Error("x");
-    // }
+    if (visited.has(`${x},${y}`)) continue;
+    visited.add(`${x},${y}`);
 
     const neighbors = [
       x + 1 < grid[0].length ? { x: x + 1, y } : null,
@@ -44,57 +29,32 @@ const bfs = (root) => {
       y + 1 < grid.length ? { x, y: y + 1 } : null,
     ];
 
-    neighbors
-      .filter((n) => n)
-      .forEach((neighbor) => {
-        // console.log(seen);
-        // console.log(neighbor.x);
-        // console.log(neighbor.y);
-        // console.log(seen.has(`${neighbor.x},${neighbor.y}`));
-        if (!seen.has(`${neighbor.x},${neighbor.y}`)) {
-          seen.add(`${neighbor.x},${neighbor.y}`);
-          // console.log(queue.length);
-          queue.push(neighbor);
-          steps += 1;
-        }
-      });
-  }
+    for (let j = 0; j < neighbors.length; j++) {
+      if (!neighbors[j]) continue;
+      const current = alpha.indexOf(grid[y][x]);
+      const next = alpha.indexOf(grid[neighbors[j].y][neighbors[j].x]);
 
-  throw new Error("Something went wrong, could not reach the peak!");
+      if (current >= next - 1) {
+        queue.push({ ...neighbors[j], s: s + 1 });
+        if (grid[neighbors[j].y][neighbors[j].x] === goal) {
+          return console.log("Answer:", s - 1);
+        }
+      }
+    }
+  }
 };
 
-// test input
-bfs({ x: 0, y: 0 });
+// Part 1.
+const row1 = grid.findIndex((row) => row.includes("S"));
+const col1 = grid[row1].findIndex((n) => n === "S");
+const start = { x: col1, y: row1 };
 
-// const visited = new Set();
-// const queue = [{ x: 0, y: 0, d: 0 }];
-//
-// while (queue.length) {
-//   const { x, y, d } = queue.shift();
-//   const curr = grid[y][x];
-//
-//   const nextMoves = [
-//     x + 1 < grid[0].length ? { x: x + 1, y, d } : null,
-//     x - 1 >= 0 ? { x: x - 1, y, d } : null,
-//     y - 1 >= 0 ? { x, y: y - 1, d } : null,
-//     y + 1 < grid.length ? { x, y: y + 1, d } : null,
-//   ];
-//
-//   for (let i = 0; i < nextMoves.length; i++) {
-//     if (!nextMoves[i]) continue;
-//
-//     const { x, y } = nextMoves[i];
-//     if (visited.has(`${x},${y}`)) continue;
-//
-//     const next = grid[y][x];
-//
-//     if (next === "E") return console.log("OMG", move.d);
-//
-//     if (curr >= next) {
-//       nextMoves[i].d += 1;
-//       visited.add(`${x},${y}`);
-//       queue.push(nextMoves[i]);
-//     }
-//   }
-// }
-// console.log("----------------------------");
+bfs({ ...start, s: 0 }, "E", alphabet);
+
+// Part 2.
+// Find E, start from the end and BFS for a
+const row2 = grid.findIndex((row) => row.includes("E"));
+const col2 = grid[row2].findIndex((n) => n === "E");
+const end = { x: col2, y: row2 };
+
+bfs({ ...end, s: 0 }, "a", alphabet.reverse());
