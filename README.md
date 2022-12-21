@@ -1,6 +1,6 @@
 # Advent of Code
 
-These are my (messy) solutions for the Advent of Code problems.
+These are my (sometimes messy, never optimized) solutions for the Advent of Code problems.
 
 [https://adventofcode.com](https://adventofcode.com/)
 
