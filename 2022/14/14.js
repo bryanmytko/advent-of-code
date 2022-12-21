@@ -7,10 +7,8 @@ const lines = fs
   .split(/\n/)
   .filter((line) => line !== "");
 
-const ROWS = 400;
-const COLS = 400;
-// const ROWS = 20;
-// const COLS = 20;
+const ROWS = 550;
+const COLS = 1000;
 const grid = [];
 
 for (let i = 0; i < COLS; i++) {
@@ -42,65 +40,50 @@ lines.forEach((line) => {
   });
 });
 
-const timer = (ms) => new Promise((res) => setTimeout(res, ms));
+let dropCount = 0;
 
 const main = async () => {
-  /* Drop sand */
-  while (1) {
-    // const drop = [500, 0];
-    let drop = [6, 0];
+  while (true) {
+    let drop = [500, 0];
+    let [x, y] = drop;
 
-    /* each "second" of sand dropping */
-    while (true) {
-      const [dropx, dropy] = drop;
-
-      /* Draw */
-      console.clear();
-      console.log(drop);
-      grid.forEach((row) => {
-        console.log(row.join(""));
-      });
-      await timer(100);
-
-      drop[1]++;
-
-      // hit air
-      if (grid[dropy + 1][dropx] === ".") {
-        console.log("air...");
-      } else if (grid[dropy + 1][dropx - 1] === ".") {
-        console.log("hit wall, fall left");
-        grid[dropy + 1][dropx - 1] = "o";
-        break;
-      } else if (grid[dropy + 1][dropx + 1] === ".") {
-        console.log("hit wall, fall right");
-        grid[dropy + 1][dropx + 1] = "o";
-        break;
-      } else {
-        console.log("hit wall, fall left");
-        grid[dropy][dropx] = "o";
-        break;
+    dropCount++;
+    console.log(dropCount);
+    try {
+      while (true) {
+        if (grid[y][x] === ".") {
+          console.log(dropCount, "air...");
+          grid[y][x] = "o";
+        } else if (grid[y + 1][x] === ".") {
+          grid[y][x] = ".";
+          y++;
+          grid[y][x] = "o";
+        } else if (grid[y + 1][x - 1] === ".") {
+          grid[y][x] = ".";
+          y++;
+          x--;
+          grid[y][x] = "o";
+        } else if (grid[y + 1][x + 1] === ".") {
+          grid[y][x] = ".";
+          y++;
+          x++;
+          grid[y][x] = "o";
+        } else break;
       }
-      //
-      // // hit a rock with something to the right and nothing to the left
-      // else if (
-      //   grid[dropy + 1][dropx] === "o" &&
-      //   grid[dropy + 1][dropx + 1] !== "."
-      // ) {
-      //   grid[dropy + 1][dropx + 1] = "o";
-      //   continue;
-      // }
-      //
-      // // hit a rock with something to the left and right
-      // else if (grid[dropy + 1][dropx] === "o") {
-      //   grid[dropy][dropx] = "o";
-      //   continue;
-      // } else break;
+    } catch (e) {
+      // This is mega-hacky but catches when our sand falls in to "infinity"
+      // by being out of bounds.
+      console.log("Answer:", dropCount - 1);
+      throw new Error("Meh...");
     }
   }
 };
 
-// main();
+main();
 
-grid.forEach((row) => {
-  console.log(row.join(""));
-});
+/* DEV draw */
+// grid.forEach(async (row, index) => {
+//   if (index > 18) return;
+//   const x = row.filter((_, index) => index > 400).join("");
+//   console.log(x);
+// });
