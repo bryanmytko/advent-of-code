@@ -7,9 +7,13 @@ const lines = fs
   .split(/\n/)
   .filter((line) => line !== "");
 
-const ROWS = 550;
-const COLS = 1000;
+const ROWS = 800;
+const COLS = 800;
+
 const grid = [];
+const ground = new Array(ROWS).fill("#");
+
+let dropCount = 0;
 
 for (let i = 0; i < COLS; i++) {
   grid.push(new Array(ROWS).fill("."));
@@ -40,50 +44,47 @@ lines.forEach((line) => {
   });
 });
 
-let dropCount = 0;
+const lastMeaningfulRowIndex = Number.parseInt(
+  grid
+    .map((row, index) => ([...new Set(row)].length > 1 ? index : false))
+    .filter((row) => row)
+    .slice(-1)
+);
 
-const main = async () => {
+grid[lastMeaningfulRowIndex + 2] = ground;
+
+const main = (hasFloor = false) => {
   while (true) {
     let drop = [500, 0];
     let [x, y] = drop;
 
     dropCount++;
-    console.log(dropCount);
-    try {
-      while (true) {
-        if (grid[y][x] === ".") {
-          console.log(dropCount, "air...");
-          grid[y][x] = "o";
-        } else if (grid[y + 1][x] === ".") {
-          grid[y][x] = ".";
-          y++;
-          grid[y][x] = "o";
-        } else if (grid[y + 1][x - 1] === ".") {
-          grid[y][x] = ".";
-          y++;
-          x--;
-          grid[y][x] = "o";
-        } else if (grid[y + 1][x + 1] === ".") {
-          grid[y][x] = ".";
-          y++;
-          x++;
-          grid[y][x] = "o";
-        } else break;
-      }
-    } catch (e) {
-      // This is mega-hacky but catches when our sand falls in to "infinity"
-      // by being out of bounds.
-      console.log("Answer:", dropCount - 1);
-      throw new Error("Meh...");
+
+    if (grid[0][500] === "o") return dropCount;
+
+    while (true) {
+      if (y === lastMeaningfulRowIndex && !hasFloor) return dropCount - 1;
+
+      if (grid[y][x] === ".") {
+        grid[y][x] = "o";
+      } else if (grid[y + 1][x] === ".") {
+        grid[y][x] = ".";
+        y++;
+        grid[y][x] = "o";
+      } else if (grid[y + 1][x - 1] === ".") {
+        grid[y][x] = ".";
+        y++;
+        x--;
+        grid[y][x] = "o";
+      } else if (grid[y + 1][x + 1] === ".") {
+        grid[y][x] = ".";
+        y++;
+        x++;
+        grid[y][x] = "o";
+      } else break;
     }
   }
 };
 
-main();
-
-/* DEV draw */
-// grid.forEach(async (row, index) => {
-//   if (index > 18) return;
-//   const x = row.filter((_, index) => index > 400).join("");
-//   console.log(x);
-// });
+console.log("Part 1.", main());
+console.log("Part 2.", main(true));
