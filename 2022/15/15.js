@@ -9,10 +9,11 @@ const input = fs
 const coords = [];
 
 input.forEach((line) => {
-  const ints = line.match(/(\-?\d+)/gi).map((n) => Number.parseInt(n));
+  const nums = line.match(/(\-?\d+)/gi).map(Number);
+
   coords.push({
-    sensor: { x: ints[0], y: ints[1] },
-    beacon: { x: ints[2], y: ints[3] },
+    sensor: { x: nums[0], y: nums[1] },
+    beacon: { x: nums[2], y: nums[3] },
   });
 });
 
