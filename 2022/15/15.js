@@ -6,11 +6,10 @@ const input = fs
   .readFileSync(file, "utf-8")
   .split(/\n/)
   .filter((n) => n !== "");
-const coords = [];
 
 // https://en.wikipedia.org/wiki/Taxicab_geometry
 const taxiCabDiff = (p1, p2) => Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
-const seen = new Set();
+const coords = [];
 
 input.forEach((line) => {
   const nums = line.match(/(\-?\d+)/gi).map(Number);
@@ -24,16 +23,27 @@ input.forEach((line) => {
   });
 });
 
-coords.forEach((coord) => {
-  const { x, y } = coord.sensor;
-  // 2,18
-  // grid[18][2]
-  for (i = 0; i < coord.diff; i++) {
-    seen.add([x + i, y]);
-    seen.add([x - i, y]);
-    seen.add([x + i, y + i]);
-    seen.add([x + i, y - i]);
-  }
-});
+const findSensorCoverageInRow = (y1) => {
+  const seen = new Set();
 
-console.log(coords);
+  coords.forEach((coord) => {
+    const { diff } = coord;
+    const { x, y } = coord.sensor;
+
+    if (y - diff <= y1 && y1 <= y + diff) {
+      seen.add(x);
+
+      for (let i = 1; i < diff / 2; i++) {
+        seen.add(x + i);
+        seen.add(x - i);
+      }
+    }
+  });
+
+  return seen.size;
+};
+
+// Test input
+console.log("Part 1.", findSensorCoverageInRow(10));
+// console.log("Part 1.", findSensorCoverageInRow(2000000));
+// too high?
