@@ -22,43 +22,45 @@ const symbolPositions = [];
 const partNumbers = [];
 
 /* Find symbol positions */
-dummyInput.forEach((n, i) => {
+input.forEach((n, i) => {
   n.split("").forEach((x, idx) =>
-    x.match(/[^\d\.+]/) ? symbolPositions.push([i, idx]) : "",
+    x.match(/[^\d\.]/) ? symbolPositions.push([i, idx]) : "",
   );
 });
 
-console.log(symbolPositions);
-
 const checkAdj = (n, row, col) => {
-  console.log("checking:", n, " in column:", col, "at row:", row);
-  const offset = ("" + n).length; // length of the number
+  const offset = n.length;
+  let foundPart;
 
   for (i = col - 1; i <= col + offset; i++) {
-    symbolPositions.forEach((sp) => {
+    if (!!foundPart) break;
+    for (j = 0; j < symbolPositions.length; j++) {
       if (
-        (sp[0] === row && sp[1] === col - 1) ||
-        (sp[0] === row && sp[1] === col + offset) ||
-        (sp[0] === row - 1 && sp[1] === i) ||
-        (sp[0] === row + 1 && sp[1] === i)
-      )
-        partNumbers.push(n);
-    });
+        (symbolPositions[j][0] === row && symbolPositions[j][1] === col - 1) ||
+        (symbolPositions[j][0] === row &&
+          symbolPositions[j][1] === col + offset) ||
+        (symbolPositions[j][0] === row - 1 && symbolPositions[j][1] === i) ||
+        (symbolPositions[j][0] === row + 1 && symbolPositions[j][1] === i)
+      ) {
+        foundPart = n;
+      }
+    }
   }
+
+  foundPart && partNumbers.push(foundPart);
 };
 
-const n = dummyInput[5];
-
-dummyInput.forEach((n, i) => {
+input.forEach((n, i) => {
   const r = /\d+/g;
   let m;
   while ((m = r.exec(n)) != null) {
     const found = m[0];
-    const index = n.indexOf(found);
-    console.log("len:", ("" + found).length);
-    checkAdj(found, i, index);
-    console.log("----------------");
+
+    checkAdj(found, i, m.index);
   }
 });
 
-console.log(partNumbers.map(Number).reduce((p, v) => p + v));
+console.log(
+  "Part I:",
+  partNumbers.map(Number).reduce((p, v) => p + v, 0),
+);
