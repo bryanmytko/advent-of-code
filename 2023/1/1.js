@@ -28,15 +28,11 @@ const strNum = [
   "nine",
 ];
 
-const findNum = (line) => {
-  const found = line.match(/one|two|three|four|five|six|seven|eight|nine|\d/g);
-  const result = found.map((f) =>
-    strNum.indexOf(f) !== -1 ? String(strNum.indexOf(f) + 1) : f,
-  );
-
-  console.log(result);
-  return result;
-};
+const findNum = (line) =>
+  Array.from(
+    line.matchAll(/(?=(one|two|three|four|five|six|seven|eight|nine|\d))/g),
+    (match) => match[1],
+  ).map((f) => (strNum.indexOf(f) !== -1 ? String(strNum.indexOf(f) + 1) : f));
 
 const recalibrator = (input) =>
   input
@@ -49,7 +45,7 @@ const recalibrator = (input) =>
 // console.log("Part I:");
 // console.log(calibrator(data));
 // console.log(calibrator(input));
-console.log("--------------------");
+// console.log("--------------------");
 console.log("Part II:");
 console.log(recalibrator(data2));
 console.log(recalibrator(input));
