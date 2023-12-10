@@ -36,11 +36,11 @@ for (i = 0; i < input.length; i++) {
 }
 
 console.log(
-  "Part I.: ",
+  "Part I:",
   possible.map(Number).reduce((p, v) => p + v),
 );
 
 console.log(
-  "Part II.:",
+  "Part II:",
   powers.reduce((p, v) => p + v),
 );
