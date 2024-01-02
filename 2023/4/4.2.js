@@ -14,39 +14,45 @@ const dummyInput = [
   "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11",
 ];
 
-const memoCards = {};
-let count = 0;
+const run = (input) => {
+  const memoCards = {};
+  let count = 0;
 
-const howManyMatches = (cardId, card) => {
-  console.log(memoCards);
-  console.log(cardId, card);
+  const howManyMatches = (cardId, card) => {
+    let curTally = 0;
+    let nextCards;
 
-  count++;
+    if (memoCards[cardId.toString()]) {
+      return memoCards[cardId.toString()];
+    } else {
+      const winningNums = card
+        .match(/\:\s+([0-9].*?)\|/)[1]
+        .split(/\s+/)
+        .slice(0, -1);
+      const myNums = card.match(/\|\s+([0-9].*)/)[1].split(/\s+/);
+      const matches = myNums.filter((n) => winningNums.includes(n));
 
-  /* Need to memoize results and use that if found */
-  // if (memoCards[cardId.toString()])
-  //   return console.log("memoized", memoCards[cardId]);
+      nextCards = new Array(matches.length)
+        .fill(0)
+        .map((_, i) => i + parseInt(cardId) + 1);
 
-  const winningNums = card
-    .match(/\:\s+([0-9].*?)\|/)[1]
-    .split(/\s+/)
-    .slice(0, -1);
-  const myNums = card.match(/\|\s+([0-9].*)/)[1].split(/\s+/);
-  const matches = myNums.filter((n) => winningNums.includes(n));
+      if (nextCards.length) {
+        curTally += nextCards.length;
+        nextCards.forEach((card) => howManyMatches(card, input[card - 1]));
+      }
+      count += curTally;
+      return curTally;
+    }
+  };
 
-  const nextCards = new Array(matches.length)
-    .fill(0)
-    .map((_, i) => i + parseInt(cardId) + 1);
+  input.map((card) => {
+    const cardId = card.match(/Card\s+(\d+)/)[1];
+    const cardValue = howManyMatches(cardId, card);
+    memoCards[cardId] = cardValue;
+  });
 
-  if (nextCards.length) {
-    // memoCards[cardId] = nextCards;
-    nextCards.forEach((card) => howManyMatches(card, input[card - 1]));
-  }
+  return count + input.length;
 };
 
-input.map((card) => {
-  const cardId = card.match(/Card\s+(\d)/)[1];
-  howManyMatches(cardId, card);
-});
-
-console.log("Part II:", count);
+// console.log("Part II (dummy):", run(dummyInput));
+console.log("Part II:", run(input));
