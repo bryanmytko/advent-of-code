@@ -35,11 +35,11 @@ def reorder_list(list, rules)
   list
 end
 
-updates.each_with_index do |update, _i|
+updates.each do |update|
   list = update.split(',')
   formatted_rules = rules.map { |r| r.split('|') }
 
-  res = list.each_with_index.map do |_l, i|
+  res = list.each_with_index.map do |_, i|
     cur = list[i]
 
     check_valid?(list, cur, formatted_rules)
