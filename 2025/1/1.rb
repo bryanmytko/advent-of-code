@@ -12,6 +12,8 @@ end
 
 result = combinations.filter do |c|
   val = rotate(c)
+
+  # there's definitely an O(1) solution for this but this works
   val.abs.times do
     val > 0 ? current2 += 1 : current2 -= 1
     zeros_seen += 1 if current2 % 100 == 0
