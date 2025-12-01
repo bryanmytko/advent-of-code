@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# file = File.open('./testInput.txt').readlines.map(&:chomp)
-file = File.open('./input.txt').readlines.map(&:chomp)
+file = File.open('./testInput.txt').readlines.map(&:chomp)
+# file = File.open('./input.txt').readlines.map(&:chomp)
 
 # class Gallivant
 class Gallivant
@@ -25,6 +25,20 @@ class Gallivant
     end
 
     p map.flatten.join.count('X')
+    start2
+  end
+
+  def start2
+    map.each_with_index do |row, i|
+      row.split('').each_with_index do |unit, j|
+        next unless ['X'].include? unit
+
+        new_map = @map.clone
+        new_map[i][j] = '#'
+        puts new_map
+        puts ''
+      end
+    end
   end
 
   private
@@ -72,3 +86,4 @@ end
 
 g = Gallivant.new(file)
 g.start
+# g.start2
