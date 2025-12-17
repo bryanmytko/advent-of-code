@@ -44,7 +44,7 @@ def largest_joltage(bank, digits)
 end
 
 joltages = rows.map { |r| largest_joltage(r, 2) }.sum
-more_joltages = rows.map { |r| largest_joltage(r, 12) }
+more_joltages = rows.map { |r| largest_joltage(r, 12) }.sum
 
 p "Part I: #{joltages}"
-p "Part II: #{more_joltages.sum}"
+p "Part II: #{more_joltages}"
