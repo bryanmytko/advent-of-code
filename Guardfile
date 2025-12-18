@@ -1,34 +1,5 @@
-# A sample Guardfile
-# More info at https://github.com/guard/guard#readme
-
-## Uncomment and set this to only include directories you want to watch
-# directories %w(app lib config test spec features) \
-#  .select{|d| Dir.exist?(d) ? d : UI.warning("Directory #{d} does not exist")}
-
-## Note: if you are using the `directories` clause above and you are not
-## watching the project directory ('.'), then you will want to move
-## the Guardfile to a watched dir and symlink it back, e.g.
-#
-#  $ mkdir config
-#  $ mv Guardfile config/
-#  $ ln -s config/Guardfile .
-#
-# and, you'll have to watch "config/Guardfile" instead of "Guardfile"
-
-# Note: The cmd option is now required due to the increasing number of ways
-#       rspec may be run, below are examples of the most common uses.
-#  * bundler: 'bundle exec rspec'
-#  * bundler binstubs: 'bin/rspec'
-#  * spring: 'bin/rspec' (This will use spring if running and you have
-#                          installed the spring binstubs per the docs)
-#  * zeus: 'zeus rspec' (requires the server to be started separately)
-#  * 'just' rspec: 'rspec'
-
 guard :rspec, cmd: "bundle exec rspec", all_on_start: true, spec_paths: ["2025"] do
-  # Watch all spec files
-  watch(%r{^2025/3/spec/.*_spec\.rb$})
-  
-  # Watch Ruby files and run their specs  
-  watch(%r{^2025/3/3\.rb$}) { "2025/3/spec/3_spec.rb" }
+  watch(%r{^2025/*/spec/.*_spec\.rb$})
+  watch(%r{^2025/(\d+)/\1\.rb$}) { |m| "2025/#{m[1]}/spec/#{m[1]}_spec.rb" }
 end
 
